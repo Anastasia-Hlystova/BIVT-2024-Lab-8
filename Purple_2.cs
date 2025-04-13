@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mail;
@@ -49,7 +49,7 @@ namespace Lab_8
             ExtraSpaces(Lines);
             Output = Lines;
         }
-        public void ExtraSpaces(string[] lines)
+        private void ExtraSpaces(string[] lines)
         {
             for (int i = 0; i < lines.Length; i++)
             {
