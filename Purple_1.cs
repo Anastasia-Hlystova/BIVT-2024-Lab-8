@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,29 +16,41 @@ namespace Lab_8
         }
         public override void Review()
         {
-            if (_input == null) return;
-            var result = new StringBuilder();
-            punctuation.Append(' ').ToArray();
-            var splited = _input.Split(punctuation);
-            int i = 0;
-            foreach (string slovo in splited)
+            if (string.IsNullOrEmpty(_input))
             {
-                if (IsWord(slovo))
+                _output = _input;
+                return;
+            }
+            var result = new StringBuilder();
+            int sotcw = -1; //sotcw - start of the current word
+
+            for (int i = 0; i < _input.Length; i++)
+            {
+                if (IsLetter(_input[i]))
                 {
-                    char[] perevorot = slovo.ToCharArray();
-                    Array.Reverse(perevorot);
-                    string naoborot = new string(perevorot);
-                    result.Append(naoborot);
+                    if (sotcw == -1)
+                        sotcw = i;
                 }
                 else
                 {
-                    result.Append(slovo);
-                }
-                i += slovo.Length + 1;
-                if (i < _input.Length)
-                {
+                    if (sotcw != -1)
+                    {
+                        string word = _input.Substring(sotcw, i - sotcw);
+                        char[] reversed = word.ToCharArray();
+                        Array.Reverse(reversed);
+                        result.Append(reversed);
+                        sotcw = -1;
+                    }
                     result.Append(_input[i]);
                 }
+            }
+
+            if (sotcw != -1)
+            {
+                string word = _input.Substring(sotcw);
+                char[] reversed = word.ToCharArray();
+                Array.Reverse(reversed);
+                result.Append(reversed);
             }
 
             _output = result.ToString();
