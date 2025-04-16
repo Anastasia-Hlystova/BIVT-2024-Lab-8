@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,15 +18,11 @@ namespace Lab_8
         public override void Review()
         {
             if(Input == null || _codes == null) return;
-            StringBuilder result = new StringBuilder(Input);
+            Output = Input;
             foreach (var code in _codes)
             {
-                if(code.Item1 == null || code.Item2 == default(char))
-                {
-                    continue;
-                }
-                result = result.Replace(code.Item2.ToString(), code.Item1);
-                Output = result.ToString();
+                if(code.Item1 == null || code.Item2 == default(char)) continue;
+                Output = Output.Replace(code.Item2.ToString(), code.Item1);
             }
         }
         public override string ToString()
