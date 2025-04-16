@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,27 +18,30 @@ namespace Lab_8
         public override void Review()
         {
             if (Input == null) return;
-            var pairs = CountPairs(Input);
-            var top5pairs = pairs.GroupBy(p => p.Item1).Select(g => new { Pair = g.Key, TotalCount = g.Sum(x => x.Item2)}).OrderByDescending(x => x.TotalCount).ThenBy(x => x.Pair).Take(5).Select(x => x.Pair).ToArray();
-            Codes = SetCodes(Input, top5pairs);
-            Output = Szhatie(Input, Codes);
+            var top5pairs = SelectTopPairs();
+            char[] freecodes = FindCodes();
+            Replace(top5pairs, freecodes);
 
         }
-        private (string Pair, int Count)[] CountPairs(string text)
+        private string[] SelectTopPairs()
         {
-            var pairs = new (string, int)[text.Length - 1];
+            string[] pairs = new string[Input.Legth];
+            int[] counts = new int[Input.Legth];
             int pairCount = 0;
-            for (int i = 0; i < text.Length - 1; i++)
+            int[] firstOccurrence = new int[Input.Length];
+            for (int i = 0; i < Input.Length - 1; i++)
             {
-                if (!IsLetter(text[i]) || !IsLetter(text[i + 1])) continue;
-                string pair = text.Substring(i, 2);
+                if (!IsLetter(Input[i]) || !IsLetter(Input[i + 1])) continue;
+
+                string pair = Input.Substring(i, 2);
                 bool found = false;
 
+                // Проверяем, есть ли уже такая пара
                 for (int j = 0; j < pairCount; j++)
                 {
-                    if (pairs[j].Item1 == pair)
+                    if (pairs[j] == pair)
                     {
-                        pairs[j].Item2++;
+                        counts[j]++;
                         found = true;
                         break;
                     }
@@ -46,48 +49,104 @@ namespace Lab_8
 
                 if (!found)
                 {
-                    pairs[pairCount++] = (pair, 1);
+                    pairs[pairCount] = pair;
+                    counts[pairCount] = 1;
+                    firstOccurrence[pairCount] = i;
+                    pairCount++;
                 }
             }
-            Array.Resize(ref pairs, pairCount);
-            return pairs;
-        }
-        private (string, char)[] SetCodes(string text, string[] pairs)
-        {
-            var codes = new (string, char)[pairs.Length];
-            char code = (char)32;
-            bool[] usedChars = new bool[127];
-            foreach (char c in text)
+
+            for (int i = 0; i < pairCount - 1; i++)
             {
-                if (c >= 32 && c <= 126)
-                    usedChars[c] = true;
-            }
-            for (int i = 0; i < pairs.Length && pairs[i] != null; i++)
-            {
-                while (code <= 126 && usedChars[code])
+                for (int j = i + 1; j < pairCount; j++)
                 {
-                    code++;
+                    if (counts[j] > counts[i] ||
+                        (counts[j] == counts[i] && firstOccurrence[j] < firstOccurrence[i]))
+                    {
+                        (counts[i], counts[j]) = (counts[j], counts[i]);
+                        (pairs[i], pairs[j]) = (pairs[j], pairs[i]);
+                        (firstOccurrence[i], firstOccurrence[j]) = (firstOccurrence[j], firstOccurrence[i]);
+                    }
+                }
+            }
+
+            string[] result = new string[Math.Min(5, pairCount)];
+            Array.Copy(pairs, result, result.Length);
+            return result;
+        }
+        private char[] FindCodes()
+        {
+            char[] codes = new char[5];
+            int count = 0;
+
+            for (int c = 32; c <= 126 && count < 5; c++)
+            {
+                bool exists = false;
+                for (int i = 0; i < Input.Length; i++)
+                {
+                    if (Input[i] == c)
+                    {
+                        exists = true;
+                        break;
+                    }
                 }
 
-                if (code > 126) break;
-
-                codes[i] = (pairs[i], code);
-                usedChars[code] = true;
+                if (!exists)
+                {
+                    codes[count++] = (char)c;
+                }
             }
+
+            if (count < 5)
+            {
+                char[] result = new char[count];
+                Array.Copy(codes, result, count);
+                return result;
+            }
+
             return codes;
         }
-        private string Szhatie(string text, (string Pair, char Code)[] codes)
+        private void Replace(string[]pairs, char[] codes)
         {
-            var result = new StringBuilder(text);
-            foreach (var obj in codes)
+            StringBuilder answer = new StringBuilder(Input);
+            (string, char)[] newCodes = new (string, char)[Math.Min(pairs.Length, codes.Length)];
+
+            for (int i = 0; i < pairs.Length && i < codes.Length; i++)
             {
-                if(obj.Pair != null)
+                string pair = pairs[i];
+                char code = codes[i];
+
+                // Замена всех вхождений пары
+                int ind = 0;
+                while (ind < answer.Length - 1)
                 {
-                    result = result.Replace(obj.Pair, obj.Code.ToString());
+                    bool flag = true;
+                    for (int j = 0; j < 2; j++)
+                    {
+                        if (ind + j >= answer.Length || answer[ind + j] != pair[j])
+                        {
+                            flag = false;
+                            break;
+                        }
+                    }
+
+                    if (flag)
+                    {
+                        answer.Remove(ind, 2);
+                        answer.Insert(ind, code);
+                        ind++;
+                    }
+                    else
+                    {
+                        ind++;
+                    }
                 }
-                
+
+                newCodes[i] = (pair, code);
             }
-            return result.ToString();
+
+            Output = answer.ToString();
+            Codes = newCodes;
         }
         public override string ToString()
         {
