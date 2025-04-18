@@ -16,6 +16,11 @@ namespace Lab_8
         }
         public override void Review()
         {
+            if (_input == null)
+            {
+                _output = null;
+                return;
+            }
             if (string.IsNullOrEmpty(_input))
             {
                 _output = _input;
@@ -23,22 +28,37 @@ namespace Lab_8
             }
             var result = new StringBuilder();
             int sotcw = -1; //sotcw - start of the current word
-
+            bool hasdigits = false;
             for (int i = 0; i < _input.Length; i++)
             {
-                if (IsLetter(_input[i]))
+                if (IsLetter(_input[i]) || char.IsDigit(_input[i]))
                 {
                     if (sotcw == -1)
+                    {
                         sotcw = i;
+                        hasdigits = false;
+                    }
+                    if (char.IsDigit(_input[i]))
+                    {
+                        hasdigits = true;
+                    }
+
                 }
                 else
                 {
                     if (sotcw != -1)
                     {
                         string word = _input.Substring(sotcw, i - sotcw);
-                        char[] reversed = word.ToCharArray();
-                        Array.Reverse(reversed);
-                        result.Append(reversed);
+                        if (hasdigits) 
+                        {
+                            result.Append(word);
+                        }
+                        else 
+                        { 
+                            char[] reversed = word.ToCharArray();
+                            Array.Reverse(reversed);
+                            result.Append(reversed);
+                        }
                         sotcw = -1;
                     }
                     result.Append(_input[i]);
@@ -48,9 +68,17 @@ namespace Lab_8
             if (sotcw != -1)
             {
                 string word = _input.Substring(sotcw);
-                char[] reversed = word.ToCharArray();
-                Array.Reverse(reversed);
-                result.Append(reversed);
+                if (hasdigits)
+                {
+                    result.Append(word);
+                }
+                else
+                {
+                    char[] reversed = word.ToCharArray();
+                    Array.Reverse(reversed);
+                    result.Append(reversed);
+                }
+                
             }
 
             _output = result.ToString();
