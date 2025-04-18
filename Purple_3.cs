@@ -25,8 +25,8 @@ namespace Lab_8
         }
         private string[] SelectTopPairs()
         {
-            string[] pairs = new string[Input.Legth];
-            int[] counts = new int[Input.Legth];
+            string[] pairs = new string[Input.Length];
+            int[] counts = new int[Input.Length];
             int pairCount = 0;
             int[] firstOccurrence = new int[Input.Length];
             for (int i = 0; i < Input.Length - 1; i++)
