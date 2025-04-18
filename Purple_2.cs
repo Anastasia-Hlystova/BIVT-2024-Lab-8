@@ -16,10 +16,10 @@ namespace Lab_8
         {
             if (Input == null) return;
             string tekst = Input;
-            string[] objects = Input.Split(' ');
+            string[] objects = Input.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
             int maxLinesAMount = objects.Length;
-            string[] Lines = new string[maxLinesAMount]; //максимально возможное кол-во строк = кол-ву объектов (слов, цифр, знаков препинания и тд) в тексте
+            string[] tempLines = new string[maxLinesAMount]; //максимально возможное кол-во строк = кол-ву объектов (слов, цифр, знаков препинания и тд) в тексте
             StringBuilder current_line = new StringBuilder();
             int ind = 0;
 
@@ -35,7 +35,7 @@ namespace Lab_8
                 }
                 else
                 {
-                    Lines[ind++] = current_line.ToString();
+                    tempLines[ind++] = current_line.ToString();
                     current_line.Clear();
                     current_line.Append(obj);
                 }
@@ -43,9 +43,10 @@ namespace Lab_8
             //добавляем последнюю строку отдельно, тк она не попадает в else, где мы добавляем строку в массив строк
             if(current_line.Length > 0)
             {
-                Lines[ind++] = current_line.ToString();
+                tempLines[ind++] = current_line.ToString();
             }
-            Array.Resize(ref Lines, ind); //приводим массив к реальному количеству строк
+            string[] Lines = new string[ind];
+            Array.Copy(tempLines, Lines, ind); //приводим массив к реальному количеству строк
             ExtraSpaces(Lines);
             Output = Lines;
         }
