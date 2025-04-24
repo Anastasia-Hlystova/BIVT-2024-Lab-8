@@ -10,17 +10,10 @@ namespace Lab_8
     {
         private string _output;
         public string Output => _output;
-        public Purple_1(string input) : base(input) 
-        {
-            _output = input;
-        }
+        public Purple_1(string input) : base(input){}
         public override void Review()
         {
-            if (_input == null)
-            {
-                _output = null;
-                return;
-            }
+            if (_input == null) return;
             if (string.IsNullOrEmpty(_input))
             {
                 _output = _input;
